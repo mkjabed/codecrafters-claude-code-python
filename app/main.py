@@ -18,12 +18,20 @@ def main():
     if not API_KEY:
         raise RuntimeError("OPENROUTER_API_KEY is not set")
 
+    is_local = os.getenv("local") == "true"
+    
+    model = (
+        "nvidia/nemotron-3-super-120b-a12b:free"
+        if is_local
+        else "anthropic/claude-haiku-4.5"
+    )
+    
     client = OpenAI(api_key=API_KEY, base_url=BASE_URL)
 
     chat = client.chat.completions.create(
-        model="openai/gpt-oss-120b:free",
+        model=model,
         messages=[{"role": "user", "content": args.p}],
-        # max_tokens = 1000,
+        max_tokens = 1000,
     )
 
     if not chat.choices or len(chat.choices) == 0:
